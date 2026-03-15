@@ -33,8 +33,8 @@
 
 **PowerShell 脚本模式（必须遵守）：**
 - 复杂 PowerShell 命令必须写成 `.ps1` 脚本文件，不允许在命令行内联
+- 脚本存放在**当前项目**的 `.claude/pscript/` 目录下（随项目版本控制，不放在全局目录）
 - 调用方式：`powershell.exe -File "<project_dir>/.claude/pscript/script-name.ps1"`
-- 脚本放在项目的 `.claude/pscript/` 目录下
 - 禁止在 Git Bash 命令里嵌套 PowerShell 语法（避免双层转义问题）
 
 ## mermaid绘图
