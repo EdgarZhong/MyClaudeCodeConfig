@@ -1,7 +1,30 @@
 {
   "skipDangerousModePermissionPrompt": true,
   "model": "opus",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(rm -rf:*)",
+      "Bash(del:*)",
+      "Bash(rd:*)",
+      "Bash(rmdir:*)",
+      "Bash(Remove-Item:*)",
+      "Bash(format:*)",
+      "Bash(diskpart:*)",
+      "Bash(reg delete:*)",
+      "Bash(net user:*)",
+      "Bash(shutdown:*)"
+    ]
+  },
   "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -Command \"$cmd = $env:TOOL_INPUT; $dangerous = @('format ', 'diskpart', 'reg delete', 'net user', 'shutdown'); foreach ($d in $dangerous) { if ($cmd -like \"*$d*\") { Write-Output 'BLOCK'; exit 1 } }\""
+      }]
+    }],
     "PostToolUse": [{
       "matcher": "Write|Edit|MultiEdit",
       "hooks": [{
