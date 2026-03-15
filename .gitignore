@@ -19,6 +19,9 @@ history.jsonl
 # backups 是 CC 自己管的，不需要 git 再备份
 backups/
 
+# .archive 用于存放临时/归档文件，不追踪
+.archive/
+
 # projects 下只保留 memory，排除会话记录
 projects/**/*.jsonl
 projects/**/sessions/
