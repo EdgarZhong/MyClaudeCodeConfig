@@ -2,7 +2,7 @@
   "skipDangerousModePermissionPrompt": true,
   "model": "opus",
   "permissions": {
-    "defaultMode": "acceptEdits",
+    "defaultMode": "bypassPermissions",
     "deny": [
       "Bash(rm:*)",
       "Bash(rm -rf:*)",
