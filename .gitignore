@@ -1,0 +1,24 @@
+﻿# 缓存
+cache/
+image-cache/
+
+# 日志和调试
+debug/
+telemetry/
+
+# 运行时状态
+ide/
+sessions/
+shell-snapshots/
+file-history/
+
+# 历史记录（大文件）
+*.jsonl
+history.jsonl
+
+# backups 是 CC 自己管的，不需要 git 再备份
+backups/
+
+# projects 下只保留 memory，排除会话记录
+projects/**/*.jsonl
+projects/**/sessions/
