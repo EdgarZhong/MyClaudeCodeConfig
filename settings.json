@@ -1,4 +1,13 @@
 {
   "skipDangerousModePermissionPrompt": true,
-  "model": "opus"
+  "model": "opus",
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit|MultiEdit",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -Command \"cd $env:USERPROFILE\\.claude; if (git status --porcelain) { git add -A; git commit -m 'auto: claude config update' }\""
+      }]
+    }]
+  }
 }
