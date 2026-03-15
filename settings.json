@@ -1,8 +1,5 @@
 {
-  "skipDangerousModePermissionPrompt": true,
-  "model": "opus",
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "deny": [
       "Bash(rm:*)",
       "Bash(rm -rf:*)",
@@ -15,15 +12,22 @@
       "Bash(reg delete:*)",
       "Bash(net user:*)",
       "Bash(shutdown:*)"
-    ]
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
-    "PostToolUse": [{
-      "matcher": "Write|Edit|MultiEdit",
-      "hooks": [{
-        "type": "command",
-        "command": "powershell -Command \"cd $env:USERPROFILE\\.claude; if (git status --porcelain) { git add -A; git commit -m 'auto: claude config update' }\""
-      }]
-    }]
-  }
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -File 'C:/Users/18518/.claude/git-autocommit.ps1'",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
+  "skipDangerousModePermissionPrompt": true
 }
