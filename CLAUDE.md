@@ -21,5 +21,21 @@
 - 需要删除的文件一律移动到项目根目录下的 `.archive/` 文件夹
 - 如果 `.archive/` 不存在，先创建并确保git不追踪它
 
+## Windows 命令行环境规范
+
+**当前环境：Git Bash（MSYS2）**
+- 路径格式用 `/c/Users/18518/`，不要用 `C:\` 或 `%USERPROFILE%`
+- 变量用 `$HOME`，不要用 `%USERPROFILE%` 或 `$env:`
+
+**命令选择原则：**
+- 日常命令优先用 Git Bash 原生语法（ls、grep、cp、mv、find 等，支持标准bash语法）
+- 需要调用 PowerShell 功能时（注册表、系统管理、.NET API 等），**务必使用脚本模式**
+
+**PowerShell 脚本模式（必须遵守）：**
+- 复杂 PowerShell 命令必须写成 `.ps1` 脚本文件，不允许在命令行内联
+- 调用方式：`powershell.exe -File "<project_dir>/.claude/pscript/script-name.ps1"`
+- 脚本放在项目的 `.claude/pscript/` 目录下
+- 禁止在 Git Bash 命令里嵌套 PowerShell 语法（避免双层转义问题）
+
 ## mermaid绘图
 - 文本中的特殊字符（如括号、空格、中文字符）会与 Mermaid 解析器发生冲突。必须使用双引号将包含特殊字符的文本包裹起来。
