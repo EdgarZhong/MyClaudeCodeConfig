@@ -1,0 +1,105 @@
+# 任务指令：IR 单模态 + COCO 预训练基准实验
+
+> **角色说明：** 你是编码执行者，不需要做任何研究决策。所有参数和策略已确定，请严格遵循。
+
+---
+
+## 目标
+
+训练一个 **IR 单模态 YOLOv8n OBB 检测模型**，使用 COCO 预训练权重初始化，作为性能基准。
+
+---
+
+## 环境
+
+```bash
+见start-conda文件
+# 框架：ultralytics-8.2/ 下的 editable install（唯一允许的框架）
+# GPU：RTX 4060 8GB
+```
+
+---
+
+## 要做的事
+
+### 1. 创建训练脚本
+
+位置：`src/trainning/ir_only_pretrained_baseline.py`
+
+训练配置：
+
+| 参数         | 值                                                           |
+| ------------ | ------------------------------------------------------------ |
+| task         | obb                                                          |
+| model        | yolov8n.pt（COCO 官方预训练，自动下载）                      |
+| data         | `src/cfg/datasets/ir_obb_dronevehicle.yaml`（已存在，指向 data_croped） |
+| imgsz        | 640                                                          |
+| epochs       | 160                                                          |
+| batch        | 16                                                           |
+| freeze       | 10                                                           |
+| patience     | 0                                                            |
+| close_mosaic | 16                                                           |
+| conf         | 0.25                                                         |
+| iou          | 0.75                                                         |
+| max_det      | 300                                                          |
+| device       | 0                                                            |
+| project      | models/baseline                                              |
+| name         | IR-Only-Pretrained                                           |
+
+**注意：** 这是 3 通道 IR 单模态训练，不是 6 通道双模态。使用标准 YOLOv8n 架构（不使用任何自定义融合模块），输入为 IR 图像（3 通道）。
+
+### 2. 确认数据集配置
+
+检查 `src/cfg/datasets/ir_obb_dronevehicle.yaml` 是否满足以下条件：
+
+- 指向 `data_croped/` 目录（去白边版本）
+- 训练/验证/测试路径分别指向 IR 图像目录（`*imgr/` 目录）
+- 标签路径指向 OBB 标签（`*labels_yolo_obb/` 目录）
+- nc: 5
+- names: [car, truck, bus, van, freight_car]
+
+如果该文件指向的是原始 `data/` 目录或配置不正确，复制一份并修改，命名为 `ir_obb_dronevehicle_croped.yaml`，在训练脚本中引用新文件。
+
+### 3. 集成 train_manager
+
+脚本需提供 `get_train_manager_spec()` 函数，返回值参照 `cm_fa_transfer_train.py` 的格式。允许通过 `train_manager.py` 启动。
+
+### 4. 启动训练
+
+```bash
+python src/trainning/train_manager.py --script src/trainning/ir_only_pretrained_baseline.py
+```
+
+---
+
+## 不要做的事
+
+- **不要** 修改任何超参数
+- **不要** 使用双模态输入或任何自定义融合模块
+- **不要** 使用 Modality Dropout（这是单模态训练，没有第二路可 drop）
+- **不要** 使用 `data/` 原始目录，必须用 `data_croped/`
+- **不要** 修改 `ultralytics-8.2/` 下的任何框架代码
+
+---
+
+## 训练完成后
+
+1. 在 `models/posttrain/IR-Only-Pretrained/` 下确认 `best.pt` 和 `results.csv` 存在
+
+2. 运行混淆矩阵：
+
+   ```bash
+   python src/tools/build_confusion_matrix_best.py
+   ```
+
+   输出到 `result/IR-Only-Pretrained/`
+
+3. 将以下信息汇总报告：
+
+   - 整体：mAP50、mAP50-95、Recall、Precision
+   - 逐类：5 个类别各自的 Precision、Recall、mAP50
+   - best epoch 编号
+
+**注意：先实施快速训练，验证代码正确性，然后删除验证导致的模型目录临时输出，等待用户手动开启全量训练，不要擅自**
+
+参考：train/archived下任意quick train脚本和ir_yolov8n_from_scratch.py
